@@ -40,6 +40,9 @@ class ClippedView @JvmOverloads constructor(
     private val rowFour = rowThree + rectInset + clipRectBottom
     private val textRow = rowFour + (1.5f * clipRectBottom)
 
+    //Task: quickReject()
+    private val rejectRow = rowFour + rectInset + 2 * clipRectBottom
+
     private var rectF = RectF(
         rectInset,
         rectInset,
@@ -59,7 +62,7 @@ class ClippedView @JvmOverloads constructor(
         drawOutsideClippingExample(canvas)
         drawSkewedTextExample(canvas)
         drawTranslatedTextExample(canvas)
-        // drawQuickRejectExample(canvas)
+        drawQuickRejectExample(canvas)
     }
 
     private fun drawBackAndUnclippedRectangle(canvas: Canvas) {
@@ -73,10 +76,10 @@ class ClippedView @JvmOverloads constructor(
     private fun drawDifferenceClippingExample(canvas: Canvas) {
         canvas.save()
         // Move the origin to the right for the next rectangle.
-        canvas.translate(columnTwo,rowOne)
+        canvas.translate(columnTwo, rowOne)
         // Use the subtraction of two clipping rectangles to create a frame.
         canvas.clipRect(
-            2 * rectInset,2 * rectInset,
+            2 * rectInset, 2 * rectInset,
             clipRectRight - 2 * rectInset,
             clipRectBottom - 2 * rectInset
         )
@@ -84,16 +87,16 @@ class ClippedView @JvmOverloads constructor(
         // .DIFFERENCE) was deprecated in API level 26. The recommended
         // alternative method is clipOutRect(float, float, float, float),
         // which is currently available in API level 26 and higher.
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             canvas.clipRect(
-                4 * rectInset,4 * rectInset,
+                4 * rectInset, 4 * rectInset,
                 clipRectRight - 4 * rectInset,
                 clipRectBottom - 4 * rectInset,
                 Region.Op.DIFFERENCE
             )
         } else {
             canvas.clipOutRect(
-                4 * rectInset,4 * rectInset,
+                4 * rectInset, 4 * rectInset,
                 clipRectRight - 4 * rectInset,
                 clipRectBottom - 4 * rectInset
             )
@@ -109,8 +112,8 @@ class ClippedView @JvmOverloads constructor(
         // keeps the internal data structure for faster reuse.
         path.rewind()
         path.addCircle(
-            circleRadius,clipRectBottom - circleRadius,
-            circleRadius,Path.Direction.CCW
+            circleRadius, clipRectBottom - circleRadius,
+            circleRadius, Path.Direction.CCW
         )
         // The method clipPath(path, Region.Op.DIFFERENCE) was deprecated in
         // API level 26. The recommended alternative method is
@@ -127,9 +130,9 @@ class ClippedView @JvmOverloads constructor(
 
     private fun drawIntersectionClippingExample(canvas: Canvas) {
         canvas.save()
-        canvas.translate(columnTwo,rowTwo)
+        canvas.translate(columnTwo, rowTwo)
         canvas.clipRect(
-            clipRectLeft,clipRectTop,
+            clipRectLeft, clipRectTop,
             clipRectRight - smallRectOffset,
             clipRectBottom - smallRectOffset
         )
@@ -141,14 +144,14 @@ class ClippedView @JvmOverloads constructor(
             canvas.clipRect(
                 clipRectLeft + smallRectOffset,
                 clipRectTop + smallRectOffset,
-                clipRectRight,clipRectBottom,
+                clipRectRight, clipRectBottom,
                 Region.Op.INTERSECT
             )
         } else {
             canvas.clipRect(
                 clipRectLeft + smallRectOffset,
                 clipRectTop + smallRectOffset,
-                clipRectRight,clipRectBottom
+                clipRectRight, clipRectBottom
             )
         }
         drawClippedRectangle(canvas)
@@ -162,13 +165,13 @@ class ClippedView @JvmOverloads constructor(
         path.addCircle(
             clipRectLeft + rectInset + circleRadius,
             clipRectTop + circleRadius + rectInset,
-            circleRadius,Path.Direction.CCW
+            circleRadius, Path.Direction.CCW
         )
         path.addRect(
             clipRectRight / 2 - circleRadius,
             clipRectTop + circleRadius + rectInset,
             clipRectRight / 2 + circleRadius,
-            clipRectBottom - rectInset,Path.Direction.CCW
+            clipRectBottom - rectInset, Path.Direction.CCW
         )
         canvas.clipPath(path)
         drawClippedRectangle(canvas)
@@ -177,10 +180,10 @@ class ClippedView @JvmOverloads constructor(
 
     private fun drawRoundedRectangleClippingExample(canvas: Canvas) {
         canvas.save()
-        canvas.translate(columnTwo,rowThree)
+        canvas.translate(columnTwo, rowThree)
         path.rewind()
         path.addRoundRect(
-            rectF,clipRectRight / 4,
+            rectF, clipRectRight / 4,
             clipRectRight / 4, Path.Direction.CCW
         )
         // CCW - counter clockwise
@@ -191,10 +194,12 @@ class ClippedView @JvmOverloads constructor(
 
     private fun drawOutsideClippingExample(canvas: Canvas) {
         canvas.save()
-        canvas.translate(columnOne,rowFour)
-        canvas.clipRect(2 * rectInset,2 * rectInset,
+        canvas.translate(columnOne, rowFour)
+        canvas.clipRect(
+            2 * rectInset, 2 * rectInset,
             clipRectRight - 2 * rectInset,
-            clipRectBottom - 2 * rectInset)
+            clipRectBottom - 2 * rectInset
+        )
         drawClippedRectangle(canvas)
         canvas.restore()
     }
@@ -205,10 +210,12 @@ class ClippedView @JvmOverloads constructor(
         // Align the RIGHT side of the text with the origin.
         paint.textAlign = Paint.Align.LEFT
         // Apply transformation to canvas.
-        canvas.translate(columnTwo,textRow)
+        canvas.translate(columnTwo, textRow)
         // Draw text.
-        canvas.drawText(context.getString(R.string.translated),
-            clipRectLeft,clipRectTop,paint)
+        canvas.drawText(
+            context.getString(R.string.translated),
+            clipRectLeft, clipRectTop, paint
+        )
         canvas.restore()
     }
 
@@ -220,12 +227,48 @@ class ClippedView @JvmOverloads constructor(
         canvas.translate(columnTwo, textRow)
         // Apply skew transformation.
         canvas.skew(0.2f, 0.3f)
-        canvas.drawText(context.getString(R.string.skewed),
-            clipRectLeft, clipRectTop, paint)
+        canvas.drawText(
+            context.getString(R.string.skewed),
+            clipRectLeft, clipRectTop, paint
+        )
         canvas.restore()
     }
 
     private fun drawQuickRejectExample(canvas: Canvas) {
+        val inClipRectangle = RectF(
+            clipRectRight / 2,
+            clipRectBottom / 2,
+            clipRectRight * 2,
+            clipRectBottom * 2
+        )
+
+        val notInClipRectangle = RectF(
+            RectF(
+                clipRectRight + 1,
+                clipRectBottom + 1,
+                clipRectRight * 2,
+                clipRectBottom * 2
+            )
+        )
+
+        canvas.save()
+        canvas.translate(columnOne, rejectRow)
+        canvas.clipRect(
+            clipRectLeft, clipRectTop,
+            clipRectRight, clipRectBottom
+        )
+        if (canvas.quickReject(
+                inClipRectangle, Canvas.EdgeType.AA
+            )
+        ) {
+            canvas.drawColor(Color.WHITE)
+        } else {
+            canvas.drawColor(Color.BLACK)
+            canvas.drawRect(
+                inClipRectangle, paint
+            )
+        }
+        canvas.restore()
     }
 
     private fun drawClippedRectangle(canvas: Canvas) {
